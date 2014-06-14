@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WSSH Terminal</title>
+	<link rel="stylesheet" type="text/css" href="css/libs/jquery.terminal/jquery.terminal.css">
+	<link rel="stylesheet" type="text/css" href="css/libs/jquery.mmenu/jquery.mmenu.css">
+	<script type="text/javascript" src="js/libs/jquery/jquery-2.1.1.js"></script>
+	<script type="text/javascript" src="js/libs/jquery.mmenu/jquery.mmenu.min.js"></script>
+	<script type="text/javascript" src="js/libs/jquery.terminal/jquery.terminal-min.js"></script>
+
+	<script type="text/javascript" src="js/libs/microtemplating/microtemplating.js"></script>
+	<script type="text/javascript" src="js/libs/bootstrap/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/libs/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/libs/bootstrap/bootstrap-theme.min.css">
+
+	<script type="text/javascript" src="js/libs/wssh/wssh.js"></script>
+
+	<script type="text/javascript" src="js/app-framework.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/wssh-term.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="css/wssh-term.css">
+	<script type="text/html" id="mmenu_ssh_sessions_tmpl">
+		<% if ( ! connections || Object.keys(connections).length === 0 ) { %>
+			<li>
+				<a href="#">
+					<i>No connection.</i>
+				</a>
+			</li>
+		<% } %>
+		<% for ( var key in connections ) { %>
+			<li data-session="<%=key%>">
+				<a class="action" href="#" style="float:left" onclick="delete_session('<%=key%>')"><span class="glyphicon glyphicon-minus-sign <%=key%>"></span></a>
+				<a class="action" href="#" onclick="start_session('<%=key%>')"><%=key%></a>
+			</li>
+		<% } %>
+	</script>
+</head>
+<body>
+	<div class="content">
+		<nav id="menu">
+			<div>
+				<h3>
+					<span class="glyphicon glyphicon-transfer"></span>
+					Connections
+				</h3>
+				<ul class="List" id="available_connections">
+				</ul>
+				<ul class="List">
+					<li>
+						<a class="action show_activity" data-activity="add_connection" href="#" style="float:left">
+							<span class="glyphicon glyphicon-plus-sign"></span>
+						</a>
+						<a class="action show_activity" data-activity="add_connection" href="#">New connection</a>
+					</li>
+					<li>
+						<a class="action show_activity" data-activity="about" href="#" style="float:left">
+							<span class="glyphicon glyphicon-info-sign"></span>
+						</a>
+						<a class="action show_activity" data-activity="about" href="#">About</a>
+					</li>
+					<li>
+						<a class="action show_activity" data-activity="about" href="#" style="float:left">
+							<span class="glyphicon glyphicon-question-sign"></span>
+						</a>
+						<a class="action show_activity" data-activity="help" href="#">Help</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div id="term_activity" class="activity"></div>
+		<div id="about_activity" class="activity hidden">
+			<h1>
+				<a class="action show_activity" data-activity="term" style="color:#333333" href="#">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a>
+				About
+			</h1>
+			<br/>
+			<dl>
+				<dt><span class="glyphicon glyphicon-user"></span> Author</dt>
+				<dd>Gwenael Pluchon <span class="badge">info at gwenp dot fr</span></dd>
+				<dt><span class="glyphicon glyphicon-copyright-mark"></span> License</dt>
+				<dd>Beerware</dd>
+			</dl>
+			
+		</div>
+
+		<div id="help_activity" class="activity hidden">
+			<h1>
+				<a class="action show_activity" data-activity="term" style="color:#333333" href="#">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a>
+				Help
+			</h1>
+			<h2>How-to</h2>
+			<p>
+				WSSH is a SSH to WebSocket Bridge.
+			</p>
+			<p>
+				To access ssh on a remote machine, you will need to install Andrea Luzzardi's <a href="https://github.com/aluzzardi/wssh">wssh</a> tool. To install it, follow the readme on Github.
+			</p>
+			<p>
+				Once wssh installed on the remote machine, launch wsshd. the IP adress and the port of the running wsshd forms the endpoint.<br/>
+				For each connection, fill the endpoint field with the following formalism : <br/>
+				<span class="badge">&lt;IP&gt;@&lt;port&gt;</span>
+			</p>
+			<p>
+				Once these steps done, you only have to connect to a remote machine.
+				<div class="alert alert-info"><b>NOTE :</b> The root and the port of the machine you want to connect to must be accessible from the endpoint, as it is only the endpoint that actually connects to the target machine !</div>
+			</p>
+		</div>
+
+		<div id="add_connection_activity" class="activity hidden" >
+			<h1>
+				<a class="action show_activity" data-activity="term" style="color:#333333" href="#" data-transition-condition="resetAddConnectionForm">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a>
+				New Connection</h1>
+			<div role="form">
+				<div class="form-group">
+					<label for="field_connection">Connection</label>
+					<input type="text" class="form-control" id="field_connection" placeholder="[root@]ip[:port]"></input>
+				</div>
+				<div class="form-group">
+					<label for="field_password">Password</label>
+					<input type="password" class="form-control" id="field_password"></input>
+				</div>
+				<div class="form-group">
+					<label for="field_endpoint">Endpoint</label>
+					<input type="text" class="form-control" id="field_endpoint" placeholder="[root@]ip[:port]"></input>
+				</div>
+				<div class="form-group">
+					<button class="action show_activity btn btn-primary" data-activity="term" data-transition-condition="saveAddConnectionForm" id="add_connection_submit">
+						<span class="glyphicon glyphicon-plus"></span>
+						Add Connection
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="inflow">
+			<div class="positioner">
+				<div class="fixed">
+					<nav class="navbar navbar-default navbar-static-top" role="navigation">
+						<div class="container">
+							<ul class="nav navbar-nav">
+								<li>
+									<a class="mmenu-trigger btn-lg pull-left" href="#">
+										<span class="glyphicon glyphicon-cog"></span>
+									</a>
+								</li>
+								<li>
+									<a class="navbar-brand" href="#">WSSH terminal</a>
+								</li>
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

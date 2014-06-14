@@ -1,0 +1,7 @@
+WSSH Terminal
+---------------------------
+  Author: Gwenael Pluchon
+  Site: http://robnyman.github.io/Firefox-OS-Boilerplate-App/
+  Github: https://github.com/gwenaelp
+
+Last updated: 14 june 2014

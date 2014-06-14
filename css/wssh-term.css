@@ -1,0 +1,88 @@
+
+html,
+body,
+.mm-page {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+  background: black;
+}
+
+/* Wrapper for page content to push down footer */
+.content {
+  min-height: 100%;
+}
+
+.activity {
+  min-height: 100%;
+  margin-top: 52px;
+  margin-bottom: -52px;
+}
+
+.navbar {
+  margin-bottom: 0;
+  background: #E65D22;
+  box-shadow: none;
+  font-weight: large;
+  border-bottom: 4px solid #CF541F;
+}
+
+.navbar-brand, .navbar-default .navbar-nav>li>a {
+  color: white !important;
+}
+
+h1 {
+  font-size: 20pt;
+}
+
+h2 {
+  font-size: 16pt;
+}
+
+#add_connection_activity, #about_activity, #help_activity {
+  background: white;
+  padding-left:10%;
+  padding-right:10%;
+  padding-top:20px;
+  padding-bottom:20px;
+}
+
+#help_activity p {
+  padding:12px;
+  display: block;
+  clear: both;
+}
+
+.navbar .container {
+  height: 50px;
+}
+
+#connect {
+  cursor: pointer;
+}
+
+.hidden {
+  display:none;
+}
+
+dt {
+  margin-top: 10px;
+}
+
+#available_connections > li.active {
+  background: #216FA3;
+}
+
+div.inflow {
+  width: 0%; 
+  height: 58px; 
+  float: right; 
+  position: relative; 
+  margin-right: 100%;
+}
+div.positioner {position: absolute; right: 0;} /*may not be needed: see below*/
+div.fixed {
+  width: 100%; 
+  height: 52px; 
+  position: fixed; 
+  top: 0px; 
+}
